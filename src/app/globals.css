@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-emerald: #0F4C3A;
+  --color-brand-emerald-hover: #1A6B52;
+  --color-brand-amber: #B45309;
+  --color-brand-amber-light: #FCD34D;
+  --color-brand-canvas: #F8FAF9;
+  --color-brand-mint: #EEF5F2;
+  --color-brand-sage: #CFE0D8;
+  --color-brand-charcoal: #1F2937;
+  --color-brand-slate: #4B5563;
+
+  --color-unit-design: #7C3AED;
+  --color-unit-webtech: #0284C7;
+  --color-unit-data: #0D9488;
+  --color-unit-media: #EA580C;
+  --color-unit-academy: #0F4C3A;
+
+  --font-heading: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  --background: #F8FAF9;
+  --foreground: #1F2937;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Ensure all numeric and price values align nicely */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
