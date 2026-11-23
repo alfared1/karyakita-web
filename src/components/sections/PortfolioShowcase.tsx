@@ -26,7 +26,7 @@ export function PortfolioShowcase() {
             Bukan Sekadar Konsep—Lihat Sistem Digital yang Sudah Kami Bangun dan Jalankan
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563]">
-            Setiap sistem dirancang dengan arsitektur modern, berorientasi mobile-first, dan memecahkan permasalahan nyata organisasi secara akuntabel.
+            Tangkapan layar langsung dari antarmuka awal (homepage) sistem web aktif yang digunakan dalam operasional tim dan organisasi mitra.
           </p>
         </div>
 
@@ -39,8 +39,10 @@ export function PortfolioShowcase() {
                 key={item.id}
                 className="rounded-3xl bg-white border border-[#CFE0D8] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group"
               >
+                {/* Browser Mockup Container */}
                 <div className="relative aspect-[16/10] bg-[#EEF5F2] border-b border-[#CFE0D8] overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-8 bg-white/90 backdrop-blur-xs border-b border-[#CFE0D8] px-3 flex items-center justify-between z-10">
+                  {/* Browser Chrome Header */}
+                  <div className="absolute top-0 left-0 right-0 h-8 bg-white/95 backdrop-blur-xs border-b border-[#CFE0D8] px-3.5 flex items-center justify-between z-10 shadow-xs">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -49,21 +51,25 @@ export function PortfolioShowcase() {
                     <span className="text-[10px] font-mono text-[#4B5563] truncate max-w-[200px]">
                       {item.liveUrl.replace("https://", "")}
                     </span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                       LIVE
                     </span>
                   </div>
 
+                  {/* Real Screenshot Preview */}
                   {!hasError ? (
-                    <div className="relative w-full h-full pt-8">
-                      <Image
-                        src={item.imagePath}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover group-hover:scale-102 transition-transform duration-300"
-                        onError={() => handleImgError(item.id)}
-                      />
+                    <div className="absolute inset-0 pt-8">
+                      <div className="relative w-full h-full overflow-hidden">
+                        <Image
+                          src={item.imagePath}
+                          alt={`Tampilan Awal ${item.title}`}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                          className="object-cover object-top group-hover:scale-102 transition-transform duration-300"
+                          onError={() => handleImgError(item.id)}
+                          priority
+                        />
+                      </div>
                     </div>
                   ) : (
                     <div className="w-full h-full pt-8 p-6 flex flex-col justify-center items-center bg-gradient-to-br from-[#0F4C3A] to-[#1A6B52] text-white">
