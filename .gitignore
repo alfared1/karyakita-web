@@ -43,8 +43,3 @@ auth_info_baileys/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.vercel
-
-# team founder photos (private)
-public/images/team/
