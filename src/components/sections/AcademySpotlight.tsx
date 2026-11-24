@@ -65,9 +65,15 @@ export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps) {
                 <h3 className="text-2xl font-bold tracking-tight text-white">
                   Workshop Publik AI One-to-Many
                 </h3>
-                <div className="mt-3 flex items-baseline gap-2">
+                <div className="mt-3 flex flex-wrap items-baseline gap-2.5">
                   <span className="text-4xl font-extrabold text-[#FCD34D] tabular-nums">
+                    Rp25.000
+                  </span>
+                  <span className="line-through text-lg sm:text-xl text-emerald-300/75 font-semibold tabular-nums">
                     Rp75.000
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FCD34D]/20 text-[#FCD34D] border border-[#FCD34D]/40">
+                    Diskon Batch 1
                   </span>
                   <span className="text-xs text-emerald-200">
                     / peserta (Pembayaran lunas 100% di muka)
@@ -105,7 +111,7 @@ export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps) {
                 onClick={handlePublicClick}
                 className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-[#B45309] hover:bg-[#92400E] text-white shadow-lg transition-all flex items-center justify-center gap-2 group"
               >
-                <span>Daftar Batch 1 Sekarang (Rp75.000)</span>
+                <span>Daftar Batch 1 Sekarang (Rp25.000)</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
