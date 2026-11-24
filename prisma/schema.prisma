@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PaymentGateStatus {
+  LOCKED_WAITING_DP
+  WAITING_FULL_100
+  VERIFYING_PROOF
+  DP_50_VERIFIED
+  WAITING_FINAL_50
+  PAID_100_VERIFIED
+  REJECTED_PROOF
+}
+
+enum PaymentScheme {
+  B2B_SPLIT_50_50
+  PUBLIC_FULL_100
+}
+
+model PublicOrder {
+  id                String            @id @default(cuid())
+  orderCode         String            @unique
+  portalToken       String            @unique
+  scheme            PaymentScheme     @default(PUBLIC_FULL_100)
+  unitCode          String            // "academy" | "design" | "webtech" | "assist" | "media"
+  customerName      String
+  customerWhatsapp  String
+  customerEmail     String
+  organization      String?
+  notes             String?
+  contractValueIdr  BigInt
+  requiredAmountIdr BigInt
+  paymentGateStatus PaymentGateStatus @default(WAITING_FULL_100)
+  proofUrl          String?           @db.Text
+  proofAmountIdr    BigInt?
+  proofSubmittedAt  DateTime?
+  rejectionReason   String?
+  verifiedById      String?
+  verifiedAt        DateTime?
+  fulfillmentJson   Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  auditLogs         OrderAuditLog[]
+
+  @@index([orderCode])
+  @@index([portalToken])
+  @@index([paymentGateStatus])
+}
+
+model OrderAuditLog {
+  id           String       @id @default(cuid())
+  orderId      String
+  order        PublicOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorName    String
+  action       String
+  beforeStatus String?
+  afterStatus  String
+  note         String?
+  createdAt    DateTime     @default(now())
+
+  @@index([orderId])
+}
+
+model GraduationCashCounter {
+  id             String   @id @default("karyakita_cash")
+  targetCashIdr  BigInt   @default(3500000)
+  currentCashIdr BigInt   @default(0)
+  updatedAt      DateTime @updatedAt
+}
+
+model StudioState {
+  key       String   @id
+  state     Json
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("studio_state")
+}

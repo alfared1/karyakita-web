@@ -3,21 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Layers, Globe, Database } from "lucide-react";
-import { buildWhatsAppUrl } from "@/config/contacts";
 
 interface HeroSectionProps {
-  onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
+  onOpenContact?: (title?: string, actionType?: "b2b" | "academy") => void;
 }
 
-export function HeroSection({ onOpenContact }: HeroSectionProps) {
-  const handleConsultClick = (e: React.MouseEvent) => {
-    const waUrl = buildWhatsAppUrl();
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact("Konsultasi Proyek B2B KaryaKita", "b2b");
-    }
-  };
-
+export function HeroSection({ onOpenContact }: HeroSectionProps = {}) {
+  void onOpenContact;
   return (
     <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-24 bg-[#F8FAF9]">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#CFE0D8_1px,transparent_1px),linear-gradient(to_bottom,#CFE0D8_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25 pointer-events-none" />
@@ -46,20 +38,19 @@ export function HeroSection({ onOpenContact }: HeroSectionProps) {
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <a
-                href={buildWhatsAppUrl() || "#"}
-                onClick={handleConsultClick}
+              <Link
+                href="/order"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-sm bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 group"
               >
-                <span>Konsultasi Proyek Gratis</span>
+                <span>Pesan Proyek B2B</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
+              </Link>
 
               <Link
-                href="#academy"
+                href="/daftar/ai-academy"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-sm bg-white hover:bg-[#EEF5F2] text-[#B45309] border-2 border-[#B45309] shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <span>Workshop AI Rp75.000</span>
+                <span>Daftar AI Academy Batch 1</span>
               </Link>
             </div>
 

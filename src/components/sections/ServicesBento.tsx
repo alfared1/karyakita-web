@@ -2,26 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import { servicesData, ServiceUnit } from "@/data/services";
+import { servicesData } from "@/data/services";
 import { Check } from "lucide-react";
-import { buildWhatsAppUrl } from "@/config/contacts";
 
 interface ServicesBentoProps {
-  onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
+  onOpenContact?: (title?: string, actionType?: "b2b" | "academy") => void;
 }
 
-export function ServicesBento({ onOpenContact }: ServicesBentoProps) {
-  const handleUnitCta = (unit: ServiceUnit, e: React.MouseEvent) => {
-    if (unit.id === "academy") {
-      return;
-    }
-    const waUrl = buildWhatsAppUrl(unit.name);
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact(`Konsultasi ${unit.name}`, "b2b");
-    }
-  };
-
+export function ServicesBento({ onOpenContact }: ServicesBentoProps = {}) {
+  void onOpenContact;
   return (
     <section id="layanan" className="py-20 bg-[#F8FAF9] scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,19 +97,18 @@ export function ServicesBento({ onOpenContact }: ServicesBentoProps) {
                 <div className="pt-6 mt-4 border-t border-[#CFE0D8]">
                   {unit.id === "academy" ? (
                     <Link
-                      href="#academy"
+                      href="/daftar/ai-academy"
                       className="w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 bg-[#0F4C3A] text-white hover:bg-[#1A6B52] transition-colors"
                     >
                       <span>{unit.ctaText}</span>
                     </Link>
                   ) : (
-                    <a
-                      href={buildWhatsAppUrl(unit.name) || "#"}
-                      onClick={(e) => handleUnitCta(unit, e)}
+                    <Link
+                      href={`/order?unit=${unit.id}`}
                       className="w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-gray-300 hover:border-[#0F4C3A] text-[#1F2937] hover:text-[#0F4C3A] hover:bg-[#EEF5F2] transition-all"
                     >
-                      <span>{unit.ctaText}</span>
-                    </a>
+                      <span>Pesan / Konsultasi Layanan &rarr;</span>
+                    </Link>
                   )}
                 </div>
               </div>

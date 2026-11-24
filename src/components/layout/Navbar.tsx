@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, X, MessageCircle } from "lucide-react";
 import { KaryaKitaLogo } from "@/components/brand/KaryaKitaLogo";
-import { buildWhatsAppUrl } from "@/config/contacts";
 
 interface NavbarProps {
-  onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
+  onOpenContact?: (title?: string, actionType?: "b2b" | "academy") => void;
 }
 
-export function Navbar({ onOpenContact }: NavbarProps) {
+export function Navbar({ onOpenContact }: NavbarProps = {}) {
+  void onOpenContact;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -22,14 +22,6 @@ export function Navbar({ onOpenContact }: NavbarProps) {
     { name: "Tim Kami", href: "#tim" },
     { name: "FAQ", href: "#faq" },
   ];
-
-  const handleConsultClick = (e: React.MouseEvent) => {
-    const waUrl = buildWhatsAppUrl();
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact("Konsultasi Proyek B2B", "b2b");
-    }
-  };
 
   return (
     <header className="sticky top-0 z-40 w-full h-[72px] bg-white/90 backdrop-blur-md border-b border-[#CFE0D8] transition-all">
@@ -55,19 +47,18 @@ export function Navbar({ onOpenContact }: NavbarProps) {
         {/* Desktop Action Buttons */}
         <div className="hidden lg:flex items-center gap-3">
           <Link
-            href="#academy"
+            href="/daftar/ai-academy"
             className="px-4 py-2 rounded-xl text-xs font-semibold text-[#0F4C3A] border border-[#0F4C3A]/30 hover:border-[#0F4C3A] hover:bg-[#EEF5F2] transition-all"
           >
             Daftar AI Academy
           </Link>
-          <a
-            href={buildWhatsAppUrl() || "#"}
-            onClick={handleConsultClick}
+          <Link
+            href="/order"
             className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-sm hover:shadow transition-all flex items-center gap-1.5"
           >
             <MessageCircle className="w-3.5 h-3.5" />
-            <span>Konsultasi Gratis</span>
-          </a>
+            <span>Pesan Proyek B2B</span>
+          </Link>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -100,21 +91,19 @@ export function Navbar({ onOpenContact }: NavbarProps) {
 
           <div className="pt-3 border-t border-[#CFE0D8] flex flex-col gap-2.5">
             <Link
-              href="#academy"
+              href="/daftar/ai-academy"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full min-h-[44px] flex items-center justify-center rounded-xl text-sm font-semibold text-[#0F4C3A] border border-[#0F4C3A] bg-[#EEF5F2]"
             >
-              Daftar AI Academy (Rp75.000)
+              Daftar AI Academy (Batch 1)
             </Link>
-            <button
-              onClick={(e) => {
-                setMobileMenuOpen(false);
-                handleConsultClick(e);
-              }}
+            <Link
+              href="/order"
+              onClick={() => setMobileMenuOpen(false)}
               className="w-full min-h-[44px] flex items-center justify-center rounded-xl text-sm font-semibold bg-[#0F4C3A] text-white shadow"
             >
-              Konsultasi Proyek B2B
-            </button>
+              Pesan Proyek B2B
+            </Link>
           </div>
         </div>
       )}

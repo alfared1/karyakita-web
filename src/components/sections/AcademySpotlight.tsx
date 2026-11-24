@@ -1,30 +1,15 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Sparkles, Check, ArrowRight, Building2 } from "lucide-react";
-import { getAcademyRegistrationUrl, buildWhatsAppUrl } from "@/config/contacts";
 
 interface AcademySpotlightProps {
-  onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
+  onOpenContact?: (title?: string, actionType?: "b2b" | "academy") => void;
 }
 
-export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps) {
-  const handlePublicClick = (e: React.MouseEvent) => {
-    const regUrl = getAcademyRegistrationUrl();
-    if (!regUrl) {
-      e.preventDefault();
-      onOpenContact("Pendaftaran Workshop AI One-to-Many Batch 1", "academy");
-    }
-  };
-
-  const handleCorporateClick = (e: React.MouseEvent) => {
-    const waUrl = buildWhatsAppUrl("Corporate AI Training");
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact("Corporate AI Training & In-House Workshop", "b2b");
-    }
-  };
-
+export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps = {}) {
+  void onOpenContact;
   return (
     <section id="academy" className="py-20 bg-white border-b border-[#CFE0D8] scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,14 +91,13 @@ export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps) {
             </div>
 
             <div className="pt-8 relative z-10">
-              <a
-                href={getAcademyRegistrationUrl() || "#"}
-                onClick={handlePublicClick}
+              <Link
+                href="/daftar/ai-academy"
                 className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-[#B45309] hover:bg-[#92400E] text-white shadow-lg transition-all flex items-center justify-center gap-2 group"
               >
                 <span>Daftar Batch 1 Sekarang (Rp25.000)</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -167,13 +151,12 @@ export function AcademySpotlight({ onOpenContact }: AcademySpotlightProps) {
             </div>
 
             <div className="pt-8">
-              <a
-                href={buildWhatsAppUrl("Corporate AI Training") || "#"}
-                onClick={handleCorporateClick}
+              <Link
+                href="/order?unit=academy"
                 className="w-full py-3.5 px-6 rounded-xl font-bold text-sm border-2 border-[#0F4C3A] text-[#0F4C3A] hover:bg-[#EEF5F2] transition-colors flex items-center justify-center gap-2 group"
               >
-                <span>Ajukan Penawaran Corporate →</span>
-              </a>
+                <span>Ajukan Penawaran Corporate &rarr;</span>
+              </Link>
             </div>
           </div>
         </div>

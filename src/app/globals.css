@@ -42,3 +42,30 @@ body {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* KaryaKita Payment Gate Design System (PGDS v1.0) Tokens */
+:root {
+  --pg-locked-bg: #FEF3C7;
+  --pg-locked-text: #92400E;
+  --pg-locked-border: #F59E0B;
+
+  --pg-verifying-bg: #E0F2FE;
+  --pg-verifying-text: #075985;
+  --pg-verifying-border: #38BDF8;
+
+  --pg-dp-ok-bg: #ECFDF5;
+  --pg-dp-ok-text: #065F46;
+  --pg-dp-ok-border: #10B981;
+
+  --pg-final-wait-bg: #FFF7ED;
+  --pg-final-wait-text: #9A3412;
+  --pg-final-wait-border: #FB923C;
+
+  --pg-paid-bg: #0F4C3A;
+  --pg-paid-text: #FFFFFF;
+  --pg-paid-border: #0F4C3A;
+
+  --pg-rejected-bg: #FEF2F2;
+  --pg-rejected-text: #991B1B;
+  --pg-rejected-border: #F87171;
+}

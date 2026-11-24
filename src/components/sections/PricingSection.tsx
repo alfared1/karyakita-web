@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Check, Sparkles, ShieldCheck, ArrowRight, Layers, HelpCircle } from "lucide-react";
 
 interface PricingSectionProps {
@@ -526,12 +527,11 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
                       <div className="flex items-center justify-between text-[11px] text-[#6B7280]">
                         <span className="font-medium text-[#4B5563]">{item.sla}</span>
                       </div>
-                      <button
-                        onClick={() =>
-                          onOpenContact(
-                            `Pemesanan Layanan: ${category.title} - ${item.name} (${item.price})`,
-                            item.actionType
-                          )
+                      <Link
+                        href={
+                          item.id === "academy-batch1"
+                            ? "/daftar/ai-academy"
+                            : `/order?unit=${category.id === "bundles" ? "webtech" : category.id}`
                         }
                         className={`w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
                           item.isPopular
@@ -539,9 +539,9 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
                             : "bg-[#EEF5F2] text-[#0F4C3A] border border-[#CFE0D8] hover:bg-[#0F4C3A] hover:text-white"
                         }`}
                       >
-                        <span>{item.ctaText || "Pilih & Konsultasi Paket"}</span>
+                        <span>{item.ctaText || "Pilih & Pesan Paket"}</span>
                         <ArrowRight className="w-4 h-4" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
