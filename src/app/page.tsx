@@ -7,6 +7,7 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { ValueStrip } from "@/components/sections/ValueStrip";
 import { ServicesBento } from "@/components/sections/ServicesBento";
 import { AcademySpotlight } from "@/components/sections/AcademySpotlight";
+import { PricingSection } from "@/components/sections/PricingSection";
 import { PortfolioShowcase } from "@/components/sections/PortfolioShowcase";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { TeamSection } from "@/components/sections/TeamSection";
@@ -58,7 +59,10 @@ export default function Home() {
         {/* 5. Spotlight AI Academy (2 Kartu Kontras) */}
         <AcademySpotlight onOpenContact={handleOpenContact} />
 
-        {/* 6. Portofolio Karya Nyata (2 Live Apps Preview) */}
+        {/* 6. Daftar Harga & Paket Lengkap 5 Lini Bisnis */}
+        <PricingSection onOpenContact={handleOpenContact} />
+
+        {/* 7. Portofolio Karya Nyata (2 Live Apps Preview) */}
         <PortfolioShowcase />
 
         {/* 7. Alur Kolaborasi & Akad Syariah (4 Langkah) */}

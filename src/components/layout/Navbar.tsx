@@ -16,6 +16,7 @@ export function Navbar({ onOpenContact }: NavbarProps) {
   const navLinks = [
     { name: "Layanan", href: "#layanan" },
     { name: "AI Academy", href: "#academy" },
+    { name: "Daftar Harga", href: "#harga" },
     { name: "Portofolio", href: "#portofolio" },
     { name: "Cara Kerja", href: "#cara-kerja" },
     { name: "Tim Kami", href: "#tim" },
