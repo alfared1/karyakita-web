@@ -4,6 +4,16 @@ import { PaymentGateStatus } from "@/types/payment-gate";
 
 export async function GET(req: NextRequest) {
   try {
+    const providedPin =
+      req.headers.get("x-cfo-pin") || req.nextUrl.searchParams.get("pin");
+    const expectedPin = process.env.ADMIN_CFO_SECRET_PIN || "192837";
+    if (!providedPin || providedPin !== expectedPin) {
+      return NextResponse.json(
+        { error: !providedPin ? "Otorisasi PIN CFO diperlukan." : "PIN Otorisasi CFO tidak valid." },
+        { status: 401 }
+      );
+    }
+
     const statusFilter = req.nextUrl.searchParams.get("status") as PaymentGateStatus | null;
 
     const where = statusFilter ? { paymentGateStatus: statusFilter } : {};

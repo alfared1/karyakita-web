@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { X, Sparkles, CheckCircle2, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { X, Sparkles, CheckCircle2, ShieldCheck, ArrowRight } from "lucide-react";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -121,12 +122,20 @@ export function ContactModal({
           </div>
 
           {/* Action Button */}
-          <div className="pt-2 flex justify-end">
+          <div className="pt-2 flex flex-col sm:flex-row justify-end gap-2.5">
+            <Link
+              href={isAcademy ? "/daftar/ai-academy" : "/order"}
+              onClick={onClose}
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold text-sm bg-[#0F4C3A] hover:bg-[#1A6B52] text-white transition-all shadow-md flex items-center justify-center gap-1.5"
+            >
+              <span>{isAcademy ? "Daftar Batch 1 Online" : "Buka Form Order Proyek"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
             <button
               onClick={onClose}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-semibold text-sm bg-[#0F4C3A] hover:bg-[#1A6B52] text-white transition-all shadow-md"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl font-semibold text-sm border border-[#CFE0D8] text-[#4B5563] hover:bg-gray-50 transition-all"
             >
-              Mengerti &amp; Lanjutkan Eksplorasi
+              Tutup
             </button>
           </div>
         </div>

@@ -24,47 +24,68 @@ interface ServicePreset {
 
 const PRESET_PACKAGES: Record<string, ServicePreset[]> = {
   design: [
-    { id: "starter", name: "Starter Brand Asset", price: 500000 },
-    { id: "corp", name: "Corporate Brand Guidelines", price: 1250000 },
-    { id: "uiux", name: "UI/UX High-Fidelity Prototype", price: 1500000 },
+    { id: "design-starter", name: "Starter Brand Asset", price: 500000 },
+    { id: "design-corporate", name: "Corporate Brand Guidelines", price: 1250000 },
+    { id: "design-uiux", name: "UI/UX Prototype Studio", price: 1500000 },
   ],
   webtech: [
-    { id: "landing", name: "High-Converting Landing Page", price: 1250000 },
-    { id: "corpweb", name: "Corporate Multi-Page Website", price: 2500000 },
-    { id: "webapp", name: "Custom Web App & Internal Dashboard", price: 3500000 },
+    { id: "web-landing", name: "High-Converting Landing Page", price: 1250000 },
+    { id: "web-company", name: "Modern Corporate Website", price: 2500000 },
+    { id: "web-app", name: "Custom Web App & Dashboard", price: 3500000 },
   ],
   assist: [
-    { id: "data", name: "Business Intelligence & Data Analysis", price: 250000 },
-    { id: "pitch", name: "Investor Pitch Deck & SOP", price: 500000 },
-    { id: "feasibility", name: "Studi Kelayakan Bisnis Komprehensif", price: 1000000 },
+    { id: "data-analysis", name: "Data Cleaning & Statistical Analysis", price: 250000 },
+    { id: "data-pitchdeck", name: "Executive Pitch Deck & SOP", price: 500000 },
+    { id: "data-feasibility", name: "Feasibility Study & Market Research", price: 1000000 },
   ],
   media: [
-    { id: "single", name: "Single Performance Video", price: 150000 },
-    { id: "retainer", name: "Monthly Growth (10 Video Komersial)", price: 1250000 },
-    { id: "affiliate", name: "Dedicated Affiliate Co-Selling", price: 500000 },
+    { id: "media-single", name: "Single Performance Video", price: 150000 },
+    { id: "media-retainer", name: "Monthly Growth (10 Video Komersial)", price: 1250000 },
+    { id: "media-affiliate", name: "Dedicated Affiliate Co-Selling (Komitmen)", price: 500000 },
   ],
   academy: [
-    { id: "inhouse", name: "In-House Corporate AI Training", price: 1500000 },
-    { id: "advisory", name: "1-on-1 Executive AI Advisory", price: 750000 },
+    { id: "academy-corporate", name: "In-House Corporate AI Training", price: 1500000 },
+    { id: "academy-advisory", name: "Executive AI Advisory (1-on-1)", price: 750000 },
+  ],
+  bundle: [
+    { id: "bundle-launchpad", name: "Paket 'Digital Launchpad'", price: 2500000 },
+    { id: "bundle-fullstack", name: "Paket 'Full Venture Transformation'", price: 4500000 },
   ],
 };
 
+function normalizeUnitCode(rawUnit: string | null): string {
+  if (!rawUnit) return "webtech";
+  if (rawUnit === "data") return "assist";
+  if (rawUnit === "bundles") return "bundle";
+  return BUSINESS_UNITS[rawUnit] ? rawUnit : "webtech";
+}
+
+function findInitialPackage(unitKey: string, pkgParam: string | null): ServicePreset {
+  const unitPackages = PRESET_PACKAGES[unitKey] || [];
+  if (pkgParam) {
+    const matched = unitPackages.find(
+      (p) => p.id === pkgParam || pkgParam.endsWith(`-${p.id}`)
+    );
+    if (matched) return matched;
+  }
+  return unitPackages[0] || { id: "custom", name: "Kustom", price: 1250000 };
+}
+
 function OrderFormContent() {
   const searchParams = useSearchParams();
-  const initialUnit = searchParams.get("unit") || "webtech";
+  const initialUnit = normalizeUnitCode(searchParams.get("unit"));
+  const initialPkgParam = searchParams.get("package");
 
-  const [selectedUnit, setSelectedUnit] = useState(
-    BUSINESS_UNITS[initialUnit] ? initialUnit : "webtech"
-  );
-  const [selectedPackage, setSelectedPackage] = useState<ServicePreset>(
-    PRESET_PACKAGES[selectedUnit]?.[0] || { id: "custom", name: "Kustom", price: 1250000 }
+  const [selectedUnit, setSelectedUnit] = useState(initialUnit);
+  const [selectedPackage, setSelectedPackage] = useState<ServicePreset>(() =>
+    findInitialPackage(initialUnit, initialPkgParam)
   );
 
   const [clientName, setClientName] = useState("");
   const [company, setCompany] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
-  const [deadline, setDeadline] = useState("14 hari");
+  const [deadline, setDeadline] = useState("Standar (7-14 Hari)");
   const [notes, setNotes] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -151,7 +172,7 @@ function OrderFormContent() {
               Mulai Kolaborasi Proyek Bisnis Anda
             </h1>
             <p className="text-sm text-[#4B5563]">
-              Pilih unit layanan, tentukan spesifikasi proyek, dan dapatkan portal pembayaran transparan dengan jaminan akad syariah *Ijarah*.
+              Pilih unit layanan, tentukan spesifikasi proyek, dan dapatkan portal pembayaran transparan dengan jaminan akad syariah <em>Ijarah</em>.
             </p>
           </div>
 
@@ -221,7 +242,7 @@ function OrderFormContent() {
                   <p className="font-semibold text-[#1F2937]">Skema Pembayaran Syariah:</p>
                   <p>• DP 50% di muka sebagai pengikat komitmen produksi.</p>
                   <p>• Pelunasan 50% setelah hasil pengerjaan disetujui bersama.</p>
-                  <p>• Bebas denda bunga / usury jika terjadi keterlambatan (*zero riba*).</p>
+                  <p>• Bebas denda bunga / usury jika terjadi keterlambatan (<em>zero riba</em>).</p>
                 </div>
               </div>
             </div>
@@ -408,19 +429,24 @@ function OrderFormContent() {
               <span>Masuk ke Portal Pembayaran Klien &rarr;</span>
             </Link>
 
-            <a
-              href={
-                buildWhatsAppUrl(
-                  `Halo Ilham/Tim KaryaKita, saya baru saja membuat pesanan proyek dengan nomor tiket *${successData.orderCode}* untuk unit *${selectedUnit}*. Mohon konfirmasi dan panduan selanjutnya. Terima kasih!`
-                ) || "#"
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-sm font-bold border border-[#0F4C3A] text-[#0F4C3A] hover:bg-[#EEF5F2] flex items-center justify-center gap-2"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>Lanjut Diskusi via WhatsApp</span>
-            </a>
+            {buildWhatsAppUrl(`${activeUnitInfo.name} (${successData.orderCode})`) ? (
+              <a
+                href={buildWhatsAppUrl(`${activeUnitInfo.name} (${successData.orderCode})`) || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-sm font-bold border border-[#0F4C3A] text-[#0F4C3A] hover:bg-[#EEF5F2] flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Lanjut Diskusi via WhatsApp</span>
+              </a>
+            ) : (
+              <Link
+                href={`/status/${successData.orderCode}`}
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl text-sm font-bold border border-[#0F4C3A] text-[#0F4C3A] hover:bg-[#EEF5F2] flex items-center justify-center gap-2"
+              >
+                <span>Pantau Status Tiket Order</span>
+              </Link>
+            )}
           </div>
         </div>
       )}

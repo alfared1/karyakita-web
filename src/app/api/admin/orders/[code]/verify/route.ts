@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { sendWhatsAppTextMessage } from "@/lib/whatsapp/client";
 
 const verifySchema = z.object({
-  action: z.enum(["APPROVE", "REJECT"]),
+  action: z.enum(["APPROVE", "REJECT", "REQUEST_FINAL_50"]),
   rejectionReason: z.string().optional(),
   pin: z.string().optional(),
 });
@@ -27,14 +27,19 @@ export async function POST(
 
     const { action, rejectionReason, pin } = parsed.data;
 
-    // Validasi PIN Keamanan CFO
+    // Validasi PIN Keamanan CFO (wajib cocok)
     const expectedPin = process.env.ADMIN_CFO_SECRET_PIN || "192837";
-    if (pin && pin !== expectedPin) {
+    if (!pin || pin !== expectedPin) {
       return NextResponse.json({ error: "PIN Otorisasi CFO tidak valid." }, { status: 403 });
     }
 
     const existingOrder = await db.publicOrder.findUnique({
       where: { orderCode: code },
+      include: {
+        auditLogs: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!existingOrder) {
@@ -44,8 +49,13 @@ export async function POST(
     const beforeStatus = existingOrder.paymentGateStatus;
     let afterStatus = beforeStatus;
     let fulfillmentPayload: Record<string, string> | null = null;
+    const hasPriorDpVerified = existingOrder.auditLogs.some(
+      (log) => log.afterStatus === "DP_50_VERIFIED"
+    );
 
-    if (action === "APPROVE") {
+    if (action === "REQUEST_FINAL_50") {
+      afterStatus = "WAITING_FINAL_50";
+    } else if (action === "APPROVE") {
       if (existingOrder.scheme === "PUBLIC_FULL_100") {
         afterStatus = "PAID_100_VERIFIED";
         fulfillmentPayload = {
@@ -56,10 +66,8 @@ export async function POST(
             "Selamat! Pembayaran Anda telah disahkan oleh Novita (CFO). Silakan gabung ke WhatsApp Group dan akses materi di atas.",
         };
       } else {
-        // B2B flow
-        if (beforeStatus === "LOCKED_WAITING_DP" || beforeStatus === "VERIFYING_PROOF") {
-          afterStatus = "DP_50_VERIFIED";
-        } else if (beforeStatus === "WAITING_FINAL_50") {
+        // B2B flow: bedakan verifikasi DP 50% awal vs Pelunasan 50% akhir
+        if (beforeStatus === "WAITING_FINAL_50" || hasPriorDpVerified) {
           afterStatus = "PAID_100_VERIFIED";
           fulfillmentPayload = {
             projectFilesUrl: "https://drive.google.com/drive/folders/karyakita-master-handoff",
@@ -74,6 +82,20 @@ export async function POST(
       afterStatus = "REJECTED_PROOF";
     }
 
+    const auditAction =
+      action === "APPROVE"
+        ? "APPROVE_PAYMENT"
+        : action === "REQUEST_FINAL_50"
+        ? "REQUEST_FINAL_50"
+        : "REJECT_PAYMENT";
+
+    const auditNote =
+      action === "APPROVE"
+        ? `Pembayaran (${afterStatus}) disahkan sebesar Rp${Number(existingOrder.requiredAmountIdr).toLocaleString("id-ID")}`
+        : action === "REQUEST_FINAL_50"
+        ? "Tahap pengerjaan selesai; gerbang tagihan pelunasan 50% dibuka untuk klien."
+        : `Bukti ditolak: ${rejectionReason}`;
+
     // Eksekusi Transaction di Prisma
     const updatedOrder = await db.$transaction(async (tx) => {
       const order = await tx.publicOrder.update({
@@ -81,19 +103,16 @@ export async function POST(
         data: {
           paymentGateStatus: afterStatus,
           rejectionReason: action === "REJECT" ? rejectionReason || "Bukti transfer tidak valid" : null,
-          verifiedById: action === "APPROVE" ? "Novita Rani (CFO)" : "Novita Rani (CFO)",
-          verifiedAt: new Date(),
+          verifiedById: action === "REQUEST_FINAL_50" ? existingOrder.verifiedById : "Novita Rani (CFO)",
+          verifiedAt: action === "REQUEST_FINAL_50" ? existingOrder.verifiedAt : new Date(),
           fulfillmentJson: fulfillmentPayload || existingOrder.fulfillmentJson || undefined,
           auditLogs: {
             create: {
               actorName: "Novita Rani (CFO)",
-              action: action === "APPROVE" ? "APPROVE_PAYMENT" : "REJECT_PAYMENT",
+              action: auditAction,
               beforeStatus,
               afterStatus,
-              note:
-                action === "APPROVE"
-                  ? `Pembayaran disahkan sebesar Rp${Number(existingOrder.requiredAmountIdr).toLocaleString("id-ID")}`
-                  : `Bukti ditolak: ${rejectionReason}`,
+              note: auditNote,
             },
           },
         },

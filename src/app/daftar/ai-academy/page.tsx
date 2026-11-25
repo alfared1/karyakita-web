@@ -193,7 +193,7 @@ export default function DaftarAIAcademyPage() {
                     <span>Akad Ijarah (Upah Edukasi Sah &amp; Halal)</span>
                   </p>
                   <p className="text-[11px] text-[#4B5563] leading-relaxed">
-                    Biaya yang dibayarkan murni untuk jasa pendampingan edukasi tanpa biaya tersembunyi (*zero gharar*).
+                    Biaya yang dibayarkan murni untuk jasa pendampingan edukasi tanpa biaya tersembunyi (<em>zero gharar</em>).
                   </p>
                 </div>
               </div>

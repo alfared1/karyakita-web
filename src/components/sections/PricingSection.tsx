@@ -15,7 +15,7 @@ interface PriceItem {
   originalPrice?: string;
   price: string;
   period?: string;
-  description: string;
+  description: React.ReactNode;
   deliverables: string[];
   sla: string;
   akad: string;
@@ -64,7 +64,11 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
           badge: "Paling Diminati",
           price: "Rp1.250.000",
           period: "/ proyek",
-          description: "Sistem identitas merek komprehensif berstandar korporat untuk meningkatkan *brand equity*.",
+          description: (
+            <>
+              Sistem identitas merek komprehensif berstandar korporat untuk meningkatkan <em>brand equity</em>.
+            </>
+          ),
           deliverables: [
             "Full Brand Identity Guideline Book (PDF)",
             "Filosofi Logo, Do & Don't Penggunaan",
@@ -392,7 +396,7 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
             Daftar Harga &amp; Paket Layanan Resmi KaryaKita
           </h2>
           <p className="text-sm sm:text-base text-[#4B5563]">
-            Sesuai cetak biru *proposal bisnis revisi*, seluruh paket dirancang tanpa denda ribawi, ruang lingkup tegas (*bebas gharar*), dan harga jujur berlandaskan akad *Ijarah* dan *Ju&apos;alah*.
+            Sesuai cetak biru <em>proposal bisnis revisi</em>, seluruh paket dirancang tanpa denda ribawi, ruang lingkup tegas (<em>bebas gharar</em>), dan harga jujur berlandaskan akad <em>Ijarah</em> dan <em>Ju&apos;alah</em>.
           </p>
         </div>
 
@@ -531,7 +535,7 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
                         href={
                           item.id === "academy-batch1"
                             ? "/daftar/ai-academy"
-                            : `/order?unit=${category.id === "bundles" ? "webtech" : category.id}`
+                            : `/order?unit=${category.id === "data" ? "assist" : category.id}&package=${item.id}`
                         }
                         className={`w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${
                           item.isPopular

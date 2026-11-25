@@ -268,27 +268,41 @@ function OrderStatusContent({
               </a>
 
               {/* Hubungi Tim Dukungan */}
-              <a
-                href={
-                  buildWhatsAppUrl(
-                    `Halo KaryaKita, saya peserta pesanan *${order.orderCode}* ingin mengonfirmasi materi dan jadwal. Terima kasih!`
-                  ) || "#"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-4 rounded-xl bg-white border border-[#CFE0D8] hover:border-[#0F4C3A] hover:shadow-xs transition-all flex items-center gap-3 group"
-              >
-                <div className="w-10 h-10 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center shrink-0 group-hover:bg-[#0F4C3A] group-hover:text-white transition-colors">
-                  <MessageCircle className="w-5 h-5" />
-                </div>
-                <div className="truncate">
-                  <p className="text-xs font-bold text-[#1F2937] group-hover:text-[#0F4C3A]">
-                    Dukungan WhatsApp 24/7
-                  </p>
-                  <p className="text-[11px] text-[#6B7280]">Bantuan &amp; Pertanyaan Peserta</p>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400 ml-auto shrink-0" />
-              </a>
+              {buildWhatsAppUrl(unitInfo.name) ? (
+                <a
+                  href={buildWhatsAppUrl(unitInfo.name) || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-xl bg-white border border-[#CFE0D8] hover:border-[#0F4C3A] hover:shadow-xs transition-all flex items-center gap-3 group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center shrink-0 group-hover:bg-[#0F4C3A] group-hover:text-white transition-colors">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-bold text-[#1F2937] group-hover:text-[#0F4C3A]">
+                      Dukungan WhatsApp 24/7
+                    </p>
+                    <p className="text-[11px] text-[#6B7280]">Bantuan &amp; Pertanyaan Peserta</p>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-gray-400 ml-auto shrink-0" />
+                </a>
+              ) : (
+                <Link
+                  href="/order"
+                  className="p-4 rounded-xl bg-white border border-[#CFE0D8] hover:border-[#0F4C3A] hover:shadow-xs transition-all flex items-center gap-3 group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center shrink-0 group-hover:bg-[#0F4C3A] group-hover:text-white transition-colors">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-bold text-[#1F2937] group-hover:text-[#0F4C3A]">
+                      Layanan Tambahan &amp; Konsultasi
+                    </p>
+                    <p className="text-[11px] text-[#6B7280]">Ajukan proyek atau diskusi baru</p>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-gray-400 ml-auto shrink-0" />
+                </Link>
+              )}
             </div>
           </div>
         )}
@@ -311,23 +325,27 @@ function OrderStatusContent({
             </div>
 
             <p className="text-xs text-emerald-900 leading-relaxed pl-13">
-              Tim spesialis KaryaKita di bawah pengawasan Hilwa Mufida (COO &amp; Head of Project Management) telah memulai proses produksi sesuai *Service Level Agreement* (SLA).
+              Tim spesialis KaryaKita di bawah pengawasan Hilwa Mufida (COO &amp; Head of Project Management) telah memulai proses produksi sesuai <em>Service Level Agreement</em> (SLA).
             </p>
 
-            <div className="pl-13 pt-1">
-              <a
-                href={
-                  buildWhatsAppUrl(
-                    `Halo Hilwa/Tim PM KaryaKita, saya klien tiket *${order.orderCode}* ingin mendiskusikan kick-off proyek. Terima kasih!`
-                  ) || "#"
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-2xs"
+            <div className="pl-13 pt-1 flex flex-wrap gap-2">
+              {buildWhatsAppUrl(unitInfo.name) && (
+                <a
+                  href={buildWhatsAppUrl(unitInfo.name) || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-2xs"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>Hubungi Project Manager (Hilwa Mufida)</span>
+                </a>
+              )}
+              <Link
+                href={`/pay/${order.portalToken}`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-[#0F4C3A] text-[#0F4C3A] bg-white hover:bg-[#EEF5F2]"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>Hubungi Project Manager (Hilwa Mufida)</span>
-              </a>
+                <span>Buka Portal Pembayaran &amp; Invoice</span>
+              </Link>
             </div>
           </div>
         )}

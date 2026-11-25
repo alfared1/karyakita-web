@@ -71,8 +71,8 @@ export function Footer({ onOpenContact }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="#academy" className="hover:text-white transition-colors">
-                  AI Academy (Rp75.000)
+                <Link href="/daftar/ai-academy" className="hover:text-white transition-colors">
+                  AI Academy (Batch 1)
                 </Link>
               </li>
               <li>

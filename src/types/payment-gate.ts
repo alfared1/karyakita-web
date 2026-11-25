@@ -121,9 +121,18 @@ export interface BankConfig {
 }
 
 export const DEFAULT_BANK_SYARIAH: BankConfig = {
-  bankName: process.env.BANK_SYARIAH_NAME || "Bank Syariah Indonesia (BSI)",
-  accountNo: process.env.BANK_SYARIAH_ACCOUNT_NO || "7234891023",
-  accountHolder: process.env.BANK_SYARIAH_ACCOUNT_HOLDER || "KaryaKita Studio / Novita Rani (CFO)",
+  bankName:
+    process.env.NEXT_PUBLIC_BANK_SYARIAH_NAME ||
+    process.env.BANK_SYARIAH_NAME ||
+    "Bank Syariah Indonesia (BSI)",
+  accountNo:
+    process.env.NEXT_PUBLIC_BANK_SYARIAH_ACCOUNT_NO ||
+    process.env.BANK_SYARIAH_ACCOUNT_NO ||
+    "7234891023",
+  accountHolder:
+    process.env.NEXT_PUBLIC_BANK_SYARIAH_ACCOUNT_HOLDER ||
+    process.env.BANK_SYARIAH_ACCOUNT_HOLDER ||
+    "KaryaKita Studio / Novita Rani (CFO)",
 };
 
 export interface BusinessUnitInfo {
@@ -169,6 +178,13 @@ export const BUSINESS_UNITS: Record<string, BusinessUnitInfo> = {
     lineNum: "LINI 5",
     badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
     description: "Corporate AI Academy & Executive Enablement",
+  },
+  bundle: {
+    code: "bundle",
+    name: "KaryaKita Ecosystem Bundling",
+    lineNum: "PAKET KHUSUS",
+    badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+    description: "Paket Transformasi Terpadu Lintas Unit (Hemat hingga Rp1.250.000)",
   },
 };
 

@@ -83,13 +83,56 @@ export function PaymentProofUploader({
           return;
         }
 
-        // Konversi file ke Base64 Data URL (Zero-Cost, hemat storage & aman di Vercel serverless)
-        const reader = new FileReader();
-        finalProofUrl = await new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(selectedFile);
-        });
+        const file = selectedFile;
+
+        if (file.type === "application/pdf" && file.size > 3 * 1024 * 1024) {
+          setErrorMessage(
+            "File PDF terlalu besar (> 3 MB) untuk unggahan langsung. Silakan gunakan tab Tautan Google Drive."
+          );
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (file.type.startsWith("image/") && file.size > 900 * 1024) {
+          // Kompres gambar di sisi klien agar ukuran Base64 tetap aman di bawah batas payload 4,5 MB Vercel
+          finalProofUrl = await new Promise<string>((resolve, reject) => {
+            const img = new Image();
+            const objUrl = URL.createObjectURL(file);
+            img.onload = () => {
+              URL.revokeObjectURL(objUrl);
+              const maxDim = 1600;
+              let { width, height } = img;
+              if (width > maxDim || height > maxDim) {
+                const scale = Math.min(maxDim / width, maxDim / height);
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+              }
+              const canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              if (!ctx) {
+                reject(new Error("Gagal memproses gambar bukti transfer."));
+                return;
+              }
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL("image/jpeg", 0.82));
+            };
+            img.onerror = () => {
+              URL.revokeObjectURL(objUrl);
+              reject(new Error("Gagal membaca file gambar."));
+            };
+            img.src = objUrl;
+          });
+        } else {
+          // Konversi file ke Base64 Data URL (Zero-Cost, hemat storage & aman di Vercel serverless)
+          const reader = new FileReader();
+          finalProofUrl = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
       }
 
       // Kirim ke API endpoint

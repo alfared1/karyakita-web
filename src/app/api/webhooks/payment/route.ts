@@ -49,18 +49,19 @@ export async function POST(req: NextRequest) {
         });
 
         // Update graduation cash counter
-        const counter = await tx.graduationCashCounter.findUnique({
+        await tx.graduationCashCounter.upsert({
           where: { id: "karyakita_cash" },
-        });
-
-        if (counter) {
-          await tx.graduationCashCounter.update({
-            where: { id: "karyakita_cash" },
-            data: {
-              currentCashIdr: counter.currentCashIdr + order.requiredAmountIdr,
+          create: {
+            id: "karyakita_cash",
+            currentCashIdr: order.requiredAmountIdr,
+            targetCashIdr: BigInt(3500000),
+          },
+          update: {
+            currentCashIdr: {
+              increment: order.requiredAmountIdr,
             },
-          });
-        }
+          },
+        });
       });
 
       return NextResponse.json({ success: true, message: "Payment processed" });

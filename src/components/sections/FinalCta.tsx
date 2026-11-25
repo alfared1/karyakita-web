@@ -1,29 +1,15 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Sparkles, MessageCircle } from "lucide-react";
-import { buildWhatsAppUrl, getAcademyRegistrationUrl } from "@/config/contacts";
 
 interface FinalCtaProps {
-  onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
+  onOpenContact?: (title?: string, actionType?: "b2b" | "academy") => void;
 }
 
-export function FinalCta({ onOpenContact }: FinalCtaProps) {
-  const handleConsultClick = (e: React.MouseEvent) => {
-    const waUrl = buildWhatsAppUrl();
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact("Konsultasi Proyek B2B", "b2b");
-    }
-  };
-
-  const handleAcademyClick = (e: React.MouseEvent) => {
-    const regUrl = getAcademyRegistrationUrl();
-    if (!regUrl) {
-      e.preventDefault();
-      onOpenContact("Pendaftaran Workshop AI Academy Batch 1", "academy");
-    }
-  };
+export function FinalCta({ onOpenContact }: FinalCtaProps = {}) {
+  void onOpenContact;
 
   return (
     <section className="py-20 bg-white">
@@ -46,26 +32,24 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
             </h2>
 
             <p className="text-sm sm:text-base text-emerald-100 max-w-2xl mx-auto leading-relaxed">
-              Diskusikan kebutuhan proyek Anda bersama tim kami tanpa biaya konsultasi awal, atau amankan kursi Anda di Batch 1 KaryaKita AI Academy (Rp75.000).
+              Pesan layanan bisnis Anda secara terstruktur dengan akad syariah transparan, atau amankan kursi Anda di Batch 1 KaryaKita AI Academy (diskon khusus Rp25.000).
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href={buildWhatsAppUrl() || "#"}
-                onClick={handleConsultClick}
+              <Link
+                href="/order"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-white hover:bg-emerald-50 text-[#0F4C3A] shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group"
               >
                 <MessageCircle className="w-4 h-4 text-[#0F4C3A]" />
-                <span>Mulai Konsultasi Proyek →</span>
-              </a>
+                <span>Pesan Proyek B2B →</span>
+              </Link>
 
-              <a
-                href={getAcademyRegistrationUrl() || "#academy"}
-                onClick={handleAcademyClick}
+              <Link
+                href="/daftar/ai-academy"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-transparent hover:bg-white/10 text-white border-2 border-white shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <span>Daftar AI Academy (Rp75.000)</span>
-              </a>
+                <span>Daftar AI Academy (Rp25.000)</span>
+              </Link>
             </div>
           </div>
         </div>

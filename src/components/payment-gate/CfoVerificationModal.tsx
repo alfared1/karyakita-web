@@ -67,6 +67,34 @@ export function CfoVerificationModal({
     }
   };
 
+  const handleRequestFinal50 = async () => {
+    setIsProcessing(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch(`/api/admin/orders/${order.orderCode}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "REQUEST_FINAL_50",
+          pin: cfoSecretPin,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Gagal membuka tagihan pelunasan 50%.");
+      }
+
+      onVerified(json.order);
+      onClose();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Kesalahan sistem");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
       setErrorMessage("Wajib mengisi alasan penolakan secara jelas.");
@@ -284,24 +312,45 @@ export function CfoVerificationModal({
               Tolak Bukti
             </button>
 
-            <button
-              type="button"
-              onClick={handleApprove}
-              disabled={!isCheckedMutasi || isProcessing}
-              className="min-h-[44px] px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] disabled:opacity-40 text-white shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Mengesahkan...</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Sahkan Pembayaran &amp; Buka Layanan</span>
-                </>
-              )}
-            </button>
+            {order.scheme === "B2B_SPLIT_50_50" && order.paymentGateStatus === "DP_50_VERIFIED" ? (
+              <button
+                type="button"
+                onClick={handleRequestFinal50}
+                disabled={isProcessing}
+                className="min-h-[44px] px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#B45309] hover:bg-[#92400E] disabled:opacity-40 text-white shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Memproses...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Proyek Selesai · Buka Tagihan Pelunasan 50%</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleApprove}
+                disabled={!isCheckedMutasi || isProcessing}
+                className="min-h-[44px] px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] disabled:opacity-40 text-white shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Mengesahkan...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Sahkan Pembayaran &amp; Buka Layanan</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

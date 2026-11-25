@@ -25,14 +25,9 @@ export default function AdminPaymentQueuePage() {
     return "";
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("karyakita_cfo_pin") === "192837";
-    }
-    return false;
-  });
-
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [pinError, setPinError] = useState<string | null>(null);
+  const [isCheckingPin, setIsCheckingPin] = useState<boolean>(false);
 
   const [orders, setOrders] = useState<PublicOrderDTO[]>([]);
   const [currentCash, setCurrentCash] = useState(0);
@@ -51,54 +46,81 @@ export default function AdminPaymentQueuePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PublicOrderDTO | null>(null);
 
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const loadOrdersWithPin = async (secretPin: string) => {
+    const res = await fetch("/api/admin/orders", {
+      headers: { "x-cfo-pin": secretPin },
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json.error || "PIN Otorisasi CFO tidak valid.");
+    }
+    setOrders(json.orders || []);
+    setCurrentCash(json.currentCashIdr || 0);
+    setTargetCash(json.targetCashIdr || 3500000);
+    if (json.counts) setCounts(json.counts);
+  };
+
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin === "192837" || pin === (process.env.NEXT_PUBLIC_CFO_PIN || "192837")) {
-      sessionStorage.setItem("karyakita_cfo_pin", pin);
+    setPinError(null);
+    setIsCheckingPin(true);
+    try {
+      await loadOrdersWithPin(pin.trim());
+      sessionStorage.setItem("karyakita_cfo_pin", pin.trim());
       setIsAuthenticated(true);
-      setPinError(null);
-    } else {
-      setPinError("PIN Otorisasi CFO tidak valid.");
+    } catch (err: unknown) {
+      setIsAuthenticated(false);
+      setPinError(err instanceof Error ? err.message : "PIN Otorisasi CFO tidak valid.");
+    } finally {
+      setIsCheckingPin(false);
     }
   };
 
-  const fetchQueue = () => {
+  const fetchQueue = async () => {
+    if (!pin) return;
     setIsLoading(true);
-    fetch("/api/admin/orders")
-      .then((res) => res.json())
-      .then((json) => {
-        setOrders(json.orders || []);
-        setCurrentCash(json.currentCashIdr || 0);
-        setTargetCash(json.targetCashIdr || 3500000);
-        if (json.counts) setCounts(json.counts);
-      })
-      .catch((err) => {
-        console.error("Gagal mengambil antrean:", err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      await loadOrdersWithPin(pin);
+    } catch (err) {
+      console.error("Gagal mengambil antrean:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     let isMounted = true;
-    if (isAuthenticated) {
-      fetch("/api/admin/orders")
-        .then((res) => res.json())
+    const savedPin = typeof window !== "undefined" ? sessionStorage.getItem("karyakita_cfo_pin") : null;
+    if (savedPin) {
+      fetch("/api/admin/orders", {
+        headers: { "x-cfo-pin": savedPin },
+      })
+        .then(async (res) => {
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || "Unauthorized");
+          return json;
+        })
         .then((json) => {
           if (isMounted) {
+            setPin(savedPin);
+            setIsAuthenticated(true);
             setOrders(json.orders || []);
             setCurrentCash(json.currentCashIdr || 0);
             setTargetCash(json.targetCashIdr || 3500000);
             if (json.counts) setCounts(json.counts);
           }
         })
-        .catch((err) => console.error("Gagal mengambil antrean:", err));
+        .catch(() => {
+          if (isMounted) {
+            sessionStorage.removeItem("karyakita_cfo_pin");
+            setIsAuthenticated(false);
+          }
+        });
     }
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated]);
+  }, []);
 
   if (!isAuthenticated) {
     return (
@@ -123,7 +145,7 @@ export default function AdminPaymentQueuePage() {
                 maxLength={6}
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Masukkan 6 Digit PIN CFO (192837)"
+                placeholder="Masukkan 6 Digit PIN CFO"
                 className="w-full text-center px-4 py-3 rounded-xl border border-[#CFE0D8] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#0F4C3A] bg-[#F8FAF9]"
               />
             </div>
@@ -132,9 +154,10 @@ export default function AdminPaymentQueuePage() {
 
             <button
               type="submit"
-              className="w-full min-h-[44px] py-2.5 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-md transition-all"
+              disabled={isCheckingPin}
+              className="w-full min-h-[44px] py-2.5 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] disabled:opacity-50 text-white shadow-md transition-all"
             >
-              Masuk ke Antrean Verifikasi &rarr;
+              {isCheckingPin ? "Memverifikasi PIN..." : "Masuk ke Antrean Verifikasi →"}
             </button>
           </form>
 
