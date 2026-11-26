@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, use, Suspense } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -91,7 +91,7 @@ interface MonitorData {
   }>;
 }
 
-export default function ProjectMonitoringPage({
+function ProjectMonitoringContent({
   params,
 }: {
   params: Promise<{ orderCode: string }>;
@@ -677,5 +677,26 @@ export default function ProjectMonitoringPage({
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ProjectMonitoringPage({
+  params,
+}: {
+  params: Promise<{ orderCode: string }>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAF9] flex items-center justify-center p-4">
+          <div className="flex flex-col items-center gap-3 text-sm text-[#4B5563]">
+            <RefreshCw className="w-8 h-8 animate-spin text-[#0F4C3A]" />
+            <span>Memuat Portal Monitoring...</span>
+          </div>
+        </div>
+      }
+    >
+      <ProjectMonitoringContent params={params} />
+    </Suspense>
   );
 }
