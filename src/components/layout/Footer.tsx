@@ -5,7 +5,7 @@ import Link from "next/link";
 import { KaryaKitaLogo } from "@/components/brand/KaryaKitaLogo";
 import { contacts, buildWhatsAppUrl } from "@/config/contacts";
 import { servicesData } from "@/data/services";
-import { MapPin, Mail, MessageSquare } from "lucide-react";
+import { MapPin, MessageSquare } from "lucide-react";
 
 interface FooterProps {
   onOpenContact: (title?: string, actionType?: "b2b" | "academy") => void;
@@ -13,11 +13,8 @@ interface FooterProps {
 
 export function Footer({ onOpenContact }: FooterProps) {
   const handleConsultClick = (e: React.MouseEvent, title: string) => {
-    const waUrl = buildWhatsAppUrl(title);
-    if (!waUrl) {
-      e.preventDefault();
-      onOpenContact(title, "b2b");
-    }
+    e.preventDefault();
+    onOpenContact(title, "b2b");
   };
 
   return (
@@ -107,33 +104,20 @@ export function Footer({ onOpenContact }: FooterProps) {
               Saluran komunikasi resmi KaryaKita untuk penjajakan B2B dan pendaftaran kelas AI.
             </p>
             <div className="space-y-2 pt-1 text-xs">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-800 border border-gray-700">
-                <span className="flex items-center gap-2">
+              <a
+                href={buildWhatsAppUrl("Konsultasi Resmi") || `https://wa.me/6285215645719`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-gray-800 border border-gray-700 hover:border-emerald-500 transition group"
+              >
+                <span className="flex items-center gap-2 text-white">
                   <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-                  WhatsApp Bisnis
+                  <span>WhatsApp Bisnis</span>
                 </span>
-                {contacts.whatsappB2BNumber ? (
-                  <span className="font-semibold text-white">{contacts.whatsappB2BNumber}</span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    Segera Hadir
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-800 border border-gray-700">
-                <span className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-emerald-400" />
-                  Email Studio
+                <span className="font-semibold text-emerald-300 font-mono">
+                  +62 852-1564-5719
                 </span>
-                {contacts.officialEmail ? (
-                  <span className="font-semibold text-white">{contacts.officialEmail}</span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    Segera Hadir
-                  </span>
-                )}
-              </div>
+              </a>
             </div>
 
             <div className="pt-2">

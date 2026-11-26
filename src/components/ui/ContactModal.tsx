@@ -146,7 +146,7 @@ export function ContactModal({
                     className="w-full py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm"
                   >
                     <MessageSquare className="w-4 h-4" />
-                    <span>Mulai Chat AI WhatsApp Resmi (+62 812-8362-6244)</span>
+                    <span>Mulai Chat AI WhatsApp Resmi (+62 852-1564-5719)</span>
                     <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                   </a>
                 </div>
@@ -237,7 +237,7 @@ export function ContactModal({
         {/* Modal Footer */}
         <div className="p-4 sm:p-5 bg-[#F8FAF9] border-t border-[#CFE0D8] flex flex-col sm:flex-row justify-between items-center gap-2.5 flex-shrink-0">
           <div className="text-[11px] text-gray-500 text-center sm:text-left">
-            Hotline Resmi Studio: <strong className="text-[#0F4C3A] font-mono">+62 812-8362-6244</strong>
+            Hotline Resmi Studio: <strong className="text-[#0F4C3A] font-mono">+62 852-1564-5719</strong>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button

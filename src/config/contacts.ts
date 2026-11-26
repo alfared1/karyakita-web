@@ -21,9 +21,9 @@ export interface ContactConfig {
 
 // Konfigurasi terpusat jalur kontak & pendaftaran KaryaKita
 export const contacts: ContactConfig = {
-  whatsappB2BNumber: "6281283626244", // Hotline Resmi Studio & AI Chatbot
+  whatsappB2BNumber: "6285215645719", // Hotline Resmi Studio & AI Chatbot (+62 852-1564-5719)
   academyRegistrationUrl: "https://karyakita-ai.vercel.app/daftar/ai-academy",
-  officialEmail: "official@karyakita.id",
+  officialEmail: "", // Dikosongkan sesuai instruksi
   socials: {
     instagram: "https://instagram.com/karyakita.id",
     tiktok: "https://tiktok.com/@karyakita.id",
@@ -35,7 +35,7 @@ export const contacts: ContactConfig = {
       name: "Syauqi Muhammad Al Fatih",
       role: "CEO / CTO & Kepala AI R&D",
       unit: "KaryaKita WebTech & AI Academy",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Konsultasi Web Next.js, Custom Web App, & Workshop AI",
     },
     {
@@ -43,7 +43,7 @@ export const contacts: ContactConfig = {
       name: "Hilwa Mufida",
       role: "COO & Head of Project Management",
       unit: "Operasional Studio & SLA Pengerjaan",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Timeline Proyek, Manajemen Tugas, & Standar Kualitas (Itqan)",
     },
     {
@@ -51,7 +51,7 @@ export const contacts: ContactConfig = {
       name: "Ilham Akbar",
       role: "CBDO & Chief Data Officer",
       unit: "KaryaKita Assist & Data",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Kemitraan B2B, Olah Data Statistik SPSS, SOP & Pitch Deck",
     },
     {
@@ -59,7 +59,7 @@ export const contacts: ContactConfig = {
       name: "Ahmad Maulana (Joe)",
       role: "Creative Director",
       unit: "KaryaKita Design (Lini 1)",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Brand Identity, Desain Logo, Guideline & Prototype UI/UX",
     },
     {
@@ -67,7 +67,7 @@ export const contacts: ContactConfig = {
       name: "Syarah Fauziah",
       role: "Chief Marketing Officer (CMO)",
       unit: "KaryaKita Media & Affiliate (Lini 4)",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Strategi Konten Video TikTok/Reels & Affiliate Co-Selling",
     },
     {
@@ -75,14 +75,14 @@ export const contacts: ContactConfig = {
       name: "Novita Rani",
       role: "Chief Financial Officer (CFO)",
       unit: "Keuangan Syariah & Payment Gate",
-      phone: "6281283626244",
+      phone: "6285215645719",
       expertise: "Verifikasi Mutasi BSI, Akad Syariah DP 50%, & Faktur Resmi",
     },
   ],
 };
 
 export function buildWhatsAppUrl(unitName?: string, customGreeting?: string): string {
-  const cleanNumber = (contacts.whatsappB2BNumber || "6281283626244").replace(/\D/g, "");
+  const cleanNumber = (contacts.whatsappB2BNumber || "6285215645719").replace(/\D/g, "");
   if (customGreeting) {
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(customGreeting)}`;
   }
@@ -93,7 +93,7 @@ export function buildWhatsAppUrl(unitName?: string, customGreeting?: string): st
 }
 
 export function buildRepWhatsAppUrl(rep: TeamRepresentative): string {
-  const cleanNumber = (rep.phone || contacts.whatsappB2BNumber || "6281283626244").replace(/\D/g, "");
+  const cleanNumber = (rep.phone || contacts.whatsappB2BNumber || "6285215645719").replace(/\D/g, "");
   const greeting = `Halo Kak ${rep.name} (${rep.role} KaryaKita), saya ingin berkonsultasi mengenai ${rep.unit}.`;
   return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(greeting)}`;
 }
