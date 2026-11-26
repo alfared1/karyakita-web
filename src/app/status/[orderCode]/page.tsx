@@ -14,6 +14,7 @@ import {
   Loader2,
   RefreshCw,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import { KaryaKitaLogo } from "@/components/brand/KaryaKitaLogo";
 import {
@@ -174,8 +175,15 @@ function OrderStatusContent({
             </p>
           </div>
 
-          <div className="self-start sm:self-center">
+          <div className="self-start sm:self-center flex flex-col sm:items-end gap-2">
             <PaymentGateBadge status={order.paymentGateStatus} size="md" />
+            <Link
+              href={`/monitor/${order.orderCode}`}
+              className="px-3 py-1.5 rounded-xl bg-[#EEF5F2] hover:bg-[#D8EAE2] text-[#0F4C3A] text-xs font-bold transition flex items-center gap-1.5 border border-[#CFE0D8]"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Monitoring Pengerjaan &rarr;</span>
+            </Link>
           </div>
         </div>
 
@@ -329,22 +337,29 @@ function OrderStatusContent({
             </p>
 
             <div className="pl-13 pt-1 flex flex-wrap gap-2">
+              <Link
+                href={`/monitor/${order.orderCode}`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-2xs"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Pantau Progres Live (Monitoring Pengerjaan) &rarr;</span>
+              </Link>
               {buildWhatsAppUrl(unitInfo.name) && (
                 <a
                   href={buildWhatsAppUrl(unitInfo.name) || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#0F4C3A] hover:bg-[#1A6B52] text-white shadow-2xs"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-[#0F4C3A] text-[#0F4C3A] bg-white hover:bg-[#EEF5F2]"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Hubungi Project Manager (Hilwa Mufida)</span>
+                  <span>Hubungi PM (Hilwa Mufida)</span>
                 </a>
               )}
               <Link
                 href={`/pay/${order.portalToken}`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-[#0F4C3A] text-[#0F4C3A] bg-white hover:bg-[#EEF5F2]"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
               >
-                <span>Buka Portal Pembayaran &amp; Invoice</span>
+                <span>Invoice / Portal Pembayaran</span>
               </Link>
             </div>
           </div>
