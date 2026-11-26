@@ -49,7 +49,7 @@ if (!hasGeminiKey) {
   console.log("   Bot siap menjawab lengkap tentang 5 lini bisnis, harga resmi, workshop AI Rp25rb, dan link order.");
   console.log("   (Opsional) Pasang GEMINI_API_KEY dari https://aistudio.google.com/app/apikey untuk mengaktifkan AI Generatif.\n");
 } else {
-  console.log("\n✅ ENGINE GEMINI AI AKTIF: Terhubung ke Google Gemini (" + (process.env.GEMINI_MODEL || "gemini-2.5-flash") + ") + Smart Fallback.\n");
+  console.log("\n✅ ENGINE GEMINI AI AKTIF: Terhubung ke Google Gemini (" + (process.env.GEMINI_MODEL || "gemini-3.5-flash") + ") + Smart Fallback.\n");
 }
 
 // Port untuk Web QR (berguna jika di-deploy ke Free VPS / Render / Railway)
@@ -81,7 +81,7 @@ const server = http.createServer((req, res) => {
           <h2>Bot WhatsApp Aktif!</h2>
           <p>Akun: <b>${connectedUser}</b></p>
           <p style="color: ${hasGeminiKey ? "#34d399" : "#60a5fa"}; font-size: 0.85rem; font-weight: bold;">
-            ${hasGeminiKey ? "✅ Gemini AI 2.5 Flash + Smart Fallback" : "⚡ Smart Knowledge Engine (Mode Offline Cerdas)"}
+            ${hasGeminiKey ? "✅ Gemini AI 3.5 Flash + Smart Fallback" : "⚡ Smart Knowledge Engine (Mode Offline Cerdas)"}
           </p>
           <p style="color: #94a3b8; font-size: 0.9rem;">
             ${hasGeminiKey ? "Bot AI siap membalas pesan masuk secara natural & otomatis 24/7." : "Bot siap menjawab tanya-jawab seputar 5 lini bisnis KaryaKita & link pesanan secara instan."}

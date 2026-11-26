@@ -107,7 +107,7 @@ export async function generateGeminiReply(
   // 2. Baca Konfigurasi Lingkungan
   const env = getSafeEnv();
   const apiKey = env.GEMINI_API_KEY?.trim();
-  const modelName = env.GEMINI_MODEL || "gemini-2.5-flash";
+  const modelName = env.GEMINI_MODEL || "gemini-3.5-flash";
 
   // 3. Fallback Cerdas: Jika GEMINI_API_KEY tidak ada atau terlalu pendek, gunakan Smart Knowledge Engine lokal
   if (!apiKey || apiKey.length < 10) {

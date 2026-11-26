@@ -3,7 +3,7 @@ import { z } from "zod";
 const envSchema = z.object({
   // Google Gemini API Configuration
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY wajib diisi di environment variables"),
-  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
+  GEMINI_MODEL: z.string().default("gemini-3.5-flash"),
 
   // Meta WhatsApp Cloud API Configuration
   WHATSAPP_ACCESS_TOKEN: z
@@ -35,7 +35,7 @@ export type EnvConfig = z.infer<typeof envSchema>;
 export function getEnv(): EnvConfig {
   const result = envSchema.safeParse({
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-3.5-flash",
     WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN,
     WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID,
     WHATSAPP_VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN,
@@ -60,7 +60,7 @@ export function getEnv(): EnvConfig {
 export function getSafeEnv(): Partial<EnvConfig> {
   return {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-3.5-flash",
     WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN,
     WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID,
     WHATSAPP_VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN,
