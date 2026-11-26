@@ -82,10 +82,16 @@ export function isKaryaKitaRelevant(text: string, fromNumber?: string): boolean 
     "jasa", "layanan", "bisa bantu buat", "bisa buatin", "bisa bikinin",
     "ada jasa", "apakah melayani", "konsultasi",
 
-    // Human Handover
+    // Pesan Proyek & Alur Order
+    "pesan proyek", "order proyek", "mau pesan", "mau order", "bikin order",
+    "cara pesan", "cara order", "form order", "link order", "alur order",
+    "status order", "pantau pesanan", "monitor", "bikin web", "pesan desain",
+
+    // Human Handover & Perwakilan Tim
     "hubungi admin", "bicara dengan manusia", "bicara admin", "cs manusia",
     "kontak owner", "kontak admin", "chat admin", "chat manusia",
-    "operator", "customer service"
+    "operator", "customer service", "perwakilan tim", "hubungi tim",
+    "kontak tim", "kontak perwakilan", "bicara dengan tim", "founder", "pic tim"
   ];
 
   const words = norm.split(" ");
@@ -129,9 +135,33 @@ export function getSmartKnowledgeReply(userMessage: string, senderName?: string)
   const norm = normalizeText(userMessage);
   const nameTag = senderName && senderName.trim() !== "" ? `Kak ${senderName}` : "Kak";
 
-  // 1. Cek Human Handover
+  // 1. Cek Human Handover / Hubungi Perwakilan Tim
   if (isHumanHandoverRequested(userMessage)) {
     return BOT_PERSONA.handoverMessage;
+  }
+
+  // 1.1 Intent Khusus: Pesan Proyek & Alur Order B2B
+  const orderKeywords = [
+    "pesan proyek", "order proyek", "mau pesan proyek", "mau pesan", "mau order",
+    "bikin proyek", "buat proyek", "cara pesan", "cara order", "link order",
+    "form order", "formulir order", "formulir pemesanan", "alur pemesanan",
+    "bagaimana cara pesan", "gimana cara order", "order b2b", "pesan web", "pesan desain"
+  ];
+  if (orderKeywords.some((k) => norm.includes(k))) {
+    return `📝 *Panduan Pemesanan Proyek Resmi KaryaKita*
+
+Halo ${nameTag}! Untuk menjamin transparansi akad dan keamanan transaksi, seluruh pemesanan proyek B2B diproses secara resmi melalui portal terintegrasi kami:
+
+🚀 *3 Langkah Mudah Memesan Proyek:*
+1️⃣ *Buka Formulir Pemesanan:*
+   👉 https://karyakita-ai.vercel.app/order
+   Pilih unit layanan yang Anda butuhkan (*WebTech, Design, Assist & Data, Media, atau Bundling*).
+2️⃣ *Akad Syariah DP 50% di Awal:*
+   Transfer komitmen DP 50% (Akad Ijarah bi al-'Amal) ke rekening resmi BSI Studio (an. *KaryaKita Studio / Novita Rani CFO*). Transaksi bebas gharar & tanpa denda bunga riba!
+3️⃣ *Akses Portal Monitoring Real-Time:*
+   Setelah verifikasi pembayaran, Anda akan langsung mendapatkan tautan monitoring live (https://karyakita-ai.vercel.app/monitor/[orderCode]) yang tersinkronisasi langsung dengan sistem *KaryaKita Hub OS* untuk memantau progres pengerjaan, status perbaikan/revisi, dan serah terima hasil akhir.
+
+💬 Perlu konsultasi ruang lingkup sebelum memesan? Ketik *hubungi perwakilan tim* untuk berdiskusi langsung dengan tim kami!`;
   }
 
   // 2. Intent: Sapaan / Salam / Greeting
@@ -163,7 +193,9 @@ Ada yang bisa kami bantu hari ini? Anda bisa menanyakan seputar:
 5️⃣ *Video Konten & Affiliate* (KaryaKita Media)
 💰 *Daftar Harga & Paket Bundling*
 
-Atau ketik *hubungi admin* untuk tersambung langsung dengan tim kami!
+📌 *Perintah Cepat:*
+• Ketik *pesan proyek* untuk membuka form order & skema DP 50%
+• Ketik *hubungi perwakilan tim* untuk berdiskusi langsung dengan PIC
 Website resmi: https://karyakita-ai.vercel.app`;
   }
 
@@ -411,5 +443,7 @@ Berikut panduan layanan kami:
 • Pesan Proyek (DP 50% Syariah): https://karyakita-ai.vercel.app/order
 • Daftar Workshop AI Batch 1: https://karyakita-ai.vercel.app/daftar/ai-academy
 
-Silakan ketik nama layanan atau pertanyaan Anda (misal: *web*, *ai*, *desain*, *harga*), atau ketik *hubungi admin* jika ingin langsung berkonsultasi dengan tim kami!`;
+📌 *Perintah Cepat Chat:*
+• Ketik *pesan proyek* untuk panduan order & monitoring real-time
+• Ketik *hubungi perwakilan tim* untuk berdiskusi dengan PIC`;
 }

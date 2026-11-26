@@ -14,6 +14,7 @@ import { TeamSection } from "@/components/sections/TeamSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { ContactModal } from "@/components/ui/ContactModal";
+import { ChatFloatingWidget } from "@/components/ui/ChatFloatingWidget";
 
 export default function Home() {
   const [modalState, setModalState] = useState<{
@@ -87,6 +88,11 @@ export default function Home() {
         onClose={handleCloseModal}
         serviceTitle={modalState.serviceTitle}
         actionType={modalState.actionType}
+      />
+
+      {/* Floating Chatbot & Action Widget */}
+      <ChatFloatingWidget
+        onOpenTeamModal={() => handleOpenContact("Konsultasi Perwakilan Tim", "b2b")}
       />
     </div>
   );
