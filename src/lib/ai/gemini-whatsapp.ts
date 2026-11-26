@@ -5,6 +5,7 @@
 
 import { GoogleGenAI } from "@google/genai";
 import { BOT_PERSONA, isHumanHandoverRequested } from "../../config/bot-persona";
+import { getSmartKnowledgeReply } from "./smart-bot-engine";
 import { getSafeEnv } from "../env";
 
 interface ChatTurn {
@@ -105,15 +106,19 @@ export async function generateGeminiReply(
 
   // 2. Baca Konfigurasi Lingkungan
   const env = getSafeEnv();
-  const apiKey = env.GEMINI_API_KEY;
+  const apiKey = env.GEMINI_API_KEY?.trim();
   const modelName = env.GEMINI_MODEL || "gemini-2.5-flash";
 
-  if (!apiKey) {
-    console.error("[Gemini AI] GEMINI_API_KEY tidak ditemukan di environment.");
-    return BOT_PERSONA.fallbackMessage;
+  // 3. Fallback Cerdas: Jika GEMINI_API_KEY tidak ada atau terlalu pendek, gunakan Smart Knowledge Engine lokal
+  if (!apiKey || apiKey.length < 10) {
+    console.log(`[Bot AI] Mode Offline Smart Knowledge Engine aktif (GEMINI_API_KEY belum terpasang).`);
+    const smartReply = getSmartKnowledgeReply(trimmedMessage, senderName);
+    appendTurn(fromNumber, "user", trimmedMessage);
+    appendTurn(fromNumber, "model", smartReply);
+    return smartReply;
   }
 
-  // 3. Siapkan Sesi & Konteks Riwayat Percakapan
+  // 4. Siapkan Sesi & Konteks Riwayat Percakapan
   const session = getOrCreateSession(fromNumber);
 
   // Jika nama pengirim diketahui, tambahkan konteks nama di pesan pengguna saat ini
@@ -133,7 +138,7 @@ export async function generateGeminiReply(
     },
   ];
 
-  // 4. Panggil Gemini API dengan Timeout Pelindung (15 detik)
+  // 5. Panggil Gemini API dengan Timeout Pelindung (15 detik)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -155,8 +160,11 @@ export async function generateGeminiReply(
     const replyText = response.text?.trim();
 
     if (!replyText) {
-      console.warn("[Gemini AI] Model mengembalikan respon teks kosong.");
-      return BOT_PERSONA.fallbackMessage;
+      console.warn("[Gemini AI] Model mengembalikan respon teks kosong. Beralih ke Smart Knowledge Engine...");
+      const smartReply = getSmartKnowledgeReply(trimmedMessage, senderName);
+      appendTurn(fromNumber, "user", trimmedMessage);
+      appendTurn(fromNumber, "model", smartReply);
+      return smartReply;
     }
 
     // Simpan ke riwayat sesi lokal
@@ -168,12 +176,17 @@ export async function generateGeminiReply(
     clearTimeout(timeoutId);
 
     if (err instanceof Error && err.name === "AbortError") {
-      console.error("[Gemini AI] Timeout: API Gemini memakan waktu lebih dari 15 detik.");
+      console.warn("[Gemini AI] Timeout: API Gemini memakan waktu lebih dari 15 detik. Menggunakan Smart Knowledge Engine...");
     } else {
-      console.error("[Gemini AI] Error saat memanggil Gemini API:", err);
+      console.warn("[Gemini AI] Gagal terhubung ke Gemini API:", err);
+      console.log("[Gemini AI] Mengaktifkan Smart Knowledge Engine lokal sebagai fallback cerdas...");
     }
 
-    return BOT_PERSONA.fallbackMessage;
+    // Fallback cerdas: Jangan pernah berikan pesan error teknis ke klien
+    const smartReply = getSmartKnowledgeReply(trimmedMessage, senderName);
+    appendTurn(fromNumber, "user", trimmedMessage);
+    appendTurn(fromNumber, "model", smartReply);
+    return smartReply;
   }
 }
 

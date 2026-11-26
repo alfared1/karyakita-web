@@ -21,23 +21,35 @@ import path from "path";
 import { generateGeminiReply } from "../src/lib/ai/gemini-whatsapp";
 import { BOT_PERSONA } from "../src/config/bot-persona";
 
-// Load environment variables dari .env.local jika ada
-const envLocalPath = path.resolve(process.cwd(), ".env.local");
-if (fs.existsSync(envLocalPath)) {
-  const envContent = fs.readFileSync(envLocalPath, "utf8");
-  for (const line of envContent.split("\n")) {
-    const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith("#")) {
-      const idx = trimmed.indexOf("=");
-      if (idx !== -1) {
-        const key = trimmed.slice(0, idx).trim();
-        const val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
-        if (!process.env[key]) {
-          process.env[key] = val;
+// Load environment variables dari .env lalu .env.local (prioritas lebih tinggi)
+for (const envFile of [".env", ".env.local"]) {
+  const envPath = path.resolve(process.cwd(), envFile);
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, "utf8");
+    for (const line of envContent.split("\n")) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#")) {
+        const idx = trimmed.indexOf("=");
+        if (idx !== -1) {
+          const key = trimmed.slice(0, idx).trim();
+          const val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
+          if (val !== "" && (!process.env[key] || envFile === ".env.local")) {
+            process.env[key] = val;
+          }
         }
       }
     }
   }
+}
+
+const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length >= 10);
+if (!hasGeminiKey) {
+  console.log("\n💡 INFO ENGINE: GEMINI_API_KEY belum terisi di .env.local.");
+  console.log("   Bot otomatis berjalan dalam mode 'Smart Knowledge Engine' (Offline Cerdas).");
+  console.log("   Bot siap menjawab lengkap tentang 5 lini bisnis, harga resmi, workshop AI Rp25rb, dan link order.");
+  console.log("   (Opsional) Pasang GEMINI_API_KEY dari https://aistudio.google.com/app/apikey untuk mengaktifkan AI Generatif.\n");
+} else {
+  console.log("\n✅ ENGINE GEMINI AI AKTIF: Terhubung ke Google Gemini (" + (process.env.GEMINI_MODEL || "gemini-2.5-flash") + ") + Smart Fallback.\n");
 }
 
 // Port untuk Web QR (berguna jika di-deploy ke Free VPS / Render / Railway)
@@ -68,7 +80,12 @@ const server = http.createServer((req, res) => {
           <div class="badge">● TERHUBUNG</div>
           <h2>Bot WhatsApp Aktif!</h2>
           <p>Akun: <b>${connectedUser}</b></p>
-          <p style="color: #94a3b8; font-size: 0.9rem;">Bot Gemini AI siap membalas pesan masuk secara otomatis 24/7.</p>
+          <p style="color: ${hasGeminiKey ? "#34d399" : "#60a5fa"}; font-size: 0.85rem; font-weight: bold;">
+            ${hasGeminiKey ? "✅ Gemini AI 2.5 Flash + Smart Fallback" : "⚡ Smart Knowledge Engine (Mode Offline Cerdas)"}
+          </p>
+          <p style="color: #94a3b8; font-size: 0.9rem;">
+            ${hasGeminiKey ? "Bot AI siap membalas pesan masuk secara natural & otomatis 24/7." : "Bot siap menjawab tanya-jawab seputar 5 lini bisnis KaryaKita & link pesanan secara instan."}
+          </p>
         </div>
       </body>
       </html>
@@ -186,7 +203,7 @@ async function startWhatsAppBot() {
       console.log("\n===============================================================");
       console.log(`✅ BOT WHATSAPP PRIBADI BERHASIL TERHUBUNG!`);
       console.log(`📞 Nomor Aktif: +${connectedUser}`);
-      console.log(`🧠 AI Engine: Google Gemini Flash (${process.env.GEMINI_MODEL || "gemini-2.5-flash"})`);
+      console.log(`🧠 AI Engine: ${hasGeminiKey ? `Google Gemini Flash (${process.env.GEMINI_MODEL || "gemini-2.5-flash"}) + Smart Fallback` : "Smart Knowledge Engine (Mode Offline Cerdas)"}`);
       console.log(`🚀 Siap membalas pesan masuk secara otomatis!`);
       console.log("===============================================================\n");
     }
@@ -215,8 +232,14 @@ async function handleIncomingMessage(sock: ReturnType<typeof makeWASocket>, msg:
   const remoteJid = msg.key.remoteJid;
   if (!remoteJid) return;
 
-  // 2. Abaikan pesan broadcast status / story WA
-  if (remoteJid === "status@broadcast" || remoteJid.includes("@broadcast")) return;
+  // 2. Abaikan pesan broadcast status / story WA & channel newsletter
+  if (
+    remoteJid === "status@broadcast" ||
+    remoteJid.includes("@broadcast") ||
+    remoteJid.endsWith("@newsletter")
+  ) {
+    return;
+  }
 
   // 3. Abaikan pesan grup (hanya balas pesan pribadi / direct message)
   if (remoteJid.endsWith("@g.us")) return;
@@ -230,9 +253,14 @@ async function handleIncomingMessage(sock: ReturnType<typeof makeWASocket>, msg:
     setTimeout(() => processedMsgMap.delete(messageId), 10 * 60 * 1000);
   }
 
-  // 5. Ekstrak teks pesan
-  const messageContent = msg.message;
-  if (!messageContent) return;
+  // 5. Ekstrak teks pesan (termasuk pesan sementara / disappearing & viewOnce)
+  const rawContent = msg.message;
+  if (!rawContent) return;
+  const messageContent =
+    rawContent.ephemeralMessage?.message ||
+    rawContent.viewOnceMessage?.message ||
+    rawContent.viewOnceMessageV2?.message ||
+    rawContent;
 
   const userText =
     messageContent.conversation ||

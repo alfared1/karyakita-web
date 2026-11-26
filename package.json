@@ -9,6 +9,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "test:webhook": "tsx scripts/test-whatsapp-webhook.ts",
+    "test:bot": "tsx scripts/test-smart-bot.ts",
     "bot:personal": "tsx scripts/run-personal-wa.ts"
   },
   "dependencies": {
