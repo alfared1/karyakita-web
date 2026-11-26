@@ -6,6 +6,7 @@ import {
   generatePortalToken,
   checkRateLimit,
 } from "@/lib/payment/order-utils";
+import { syncOrderToHub } from "@/lib/hub/sync-service";
 
 const createOrderSchema = z.object({
   customerName: z.string().min(2, "Nama minimal 2 karakter"),
@@ -77,6 +78,13 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Sinkronisasi otomatis pesanan baru ke KaryaKita Hub OS (Lead & Project Waiting DP)
+    try {
+      await syncOrderToHub(order);
+    } catch (syncErr) {
+      console.warn("[Hub Auto-Sync Warning on Order Creation]:", syncErr);
+    }
 
     return NextResponse.json({
       success: true,

@@ -45,6 +45,29 @@ export default function AdminPaymentQueuePage() {
   >("VERIFYING_PROOF");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PublicOrderDTO | null>(null);
+  const [isSyncingHub, setIsSyncingHub] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+
+  const handleSyncAllHub = async () => {
+    setIsSyncingHub(true);
+    setSyncFeedback(null);
+    try {
+      const res = await fetch("/api/admin/hub-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal sinkronisasi");
+      setSyncFeedback(json.message || "Semua data berhasil disinkronkan ke KaryaKita Hub OS!");
+      setTimeout(() => setSyncFeedback(null), 5000);
+    } catch (err: unknown) {
+      setSyncFeedback(err instanceof Error ? err.message : "Gagal sinkronisasi ke Hub");
+      setTimeout(() => setSyncFeedback(null), 5000);
+    } finally {
+      setIsSyncingHub(false);
+    }
+  };
 
   const loadOrdersWithPin = async (secretPin: string) => {
     const res = await fetch("/api/admin/orders", {
@@ -200,7 +223,19 @@ export default function AdminPaymentQueuePage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={handleSyncAllHub}
+              disabled={isSyncingHub}
+              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[#EEF5F2] text-[#0F4C3A] hover:bg-[#D8EAE2] transition-all flex items-center gap-1.5 border border-[#CFE0D8]"
+              title="Sinkronkan seluruh data proyek dan kas ke KaryaKita Hub OS"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingHub ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">
+                {isSyncingHub ? "Menyinkronkan..." : "Sinkron ke Hub OS"}
+              </span>
+            </button>
+
             <button
               onClick={fetchQueue}
               disabled={isLoading}
@@ -225,6 +260,21 @@ export default function AdminPaymentQueuePage() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {syncFeedback && (
+          <div className="p-3.5 rounded-xl bg-[#EEF5F2] border border-[#A3C7B8] text-xs text-[#0F4C3A] font-semibold flex items-center justify-between shadow-xs transition-all">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#0F4C3A]" />
+              <span>{syncFeedback}</span>
+            </div>
+            <button
+              onClick={() => setSyncFeedback(null)}
+              className="text-[#0F4C3A] hover:underline text-[11px]"
+            >
+              Tutup
+            </button>
+          </div>
+        )}
+
         {/* Graduation Rule Meter Banner */}
         <GraduationRuleMeter currentCashIdr={currentCash} targetCashIdr={targetCash} />
 

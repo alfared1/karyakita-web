@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { sendWhatsAppTextMessage } from "@/lib/whatsapp/client";
+import { syncOrderToHub } from "@/lib/hub/sync-service";
 
 const verifySchema = z.object({
   action: z.enum(["APPROVE", "REJECT", "REQUEST_FINAL_50"]),
@@ -137,6 +138,13 @@ export async function POST(
 
       return order;
     });
+
+    // Sinkronisasi Otomatis ke KaryaKita Hub OS (Projects & Cashflow)
+    try {
+      await syncOrderToHub(updatedOrder);
+    } catch (syncErr) {
+      console.warn("[Hub Auto-Sync Warning]:", syncErr);
+    }
 
     // Notifikasi Otomatis via WhatsApp (Graceful Skip bila belum terpasang)
     try {

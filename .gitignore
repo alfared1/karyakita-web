@@ -40,6 +40,9 @@ auth_info_baileys/
 # vercel
 .vercel
 
+# scratch
+scratch/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { syncOrderToHub } from "@/lib/hub/sync-service";
 
 const proofSchema = z.object({
   proofUrl: z.string().min(10, "Bukti transfer tidak valid"),
@@ -61,6 +62,13 @@ export async function POST(
         },
       },
     });
+
+    // Sinkronisasi status bukti transfer ke KaryaKita Hub OS
+    try {
+      await syncOrderToHub(updated);
+    } catch (syncErr) {
+      console.warn("[Hub Auto-Sync Warning on Proof Upload]:", syncErr);
+    }
 
     return NextResponse.json({
       success: true,
