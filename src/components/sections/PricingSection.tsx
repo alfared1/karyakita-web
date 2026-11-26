@@ -33,7 +33,7 @@ interface CategoryLine {
 }
 
 export function PricingSection({ onOpenContact }: PricingSectionProps) {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("design");
 
   const categories: CategoryLine[] = [
     {
@@ -402,16 +402,6 @@ export function PricingSection({ onOpenContact }: PricingSectionProps) {
 
         {/* Tab Filter Navigation */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-14">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              activeTab === "all"
-                ? "bg-[#0F4C3A] text-white shadow-md"
-                : "bg-white text-[#4B5563] border border-[#CFE0D8] hover:bg-[#EEF5F2] hover:text-[#0F4C3A]"
-            }`}
-          >
-            Semua Lini ({categories.reduce((acc, curr) => acc + curr.items.length, 0)})
-          </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
