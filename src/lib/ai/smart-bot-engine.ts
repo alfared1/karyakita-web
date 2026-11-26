@@ -14,6 +14,103 @@ export interface IntentMatch {
   response: string;
 }
 
+// In-Memory tracker nomor telepon yang sedang aktif dalam sesi tanya jawab KaryaKita (TTL 30 menit)
+const activeKaryaKitaSessions = new Map<string, number>();
+
+/**
+ * Filter Relevansi KaryaKita:
+ * Memastikan bot HANYA membalas pesan yang berkaitan dengan KaryaKita (layanan, harga, workshop, order).
+ * Pesan pribadi sehari-hari dari teman/keluarga (misal: "Bro di mana?", "Besok kuliah ga?") diabaikan agar dijawab manual oleh pemilik.
+ */
+export function isKaryaKitaRelevant(text: string, fromNumber?: string): boolean {
+  if (!text || text.trim() === "") return false;
+
+  const norm = normalizeText(text);
+  const now = Date.now();
+  const sessionTtlMs = 30 * 60 * 1000;
+
+  // 1. Jika nomor ini sedang aktif dalam sesi konsultasi KaryaKita dalam 30 menit terakhir, izinkan percakapan lanjutan
+  if (fromNumber) {
+    const lastTime = activeKaryaKitaSessions.get(fromNumber);
+    if (lastTime && now - lastTime < sessionTtlMs) {
+      activeKaryaKitaSessions.set(fromNumber, now);
+      return true;
+    }
+  }
+
+  // 2. Daftar Kata Kunci Relevan Seputar KaryaKita, 5 Lini Bisnis, & Layanan Komersial
+  const businessKeywords = [
+    // Entitas & Brand
+    "karyakita", "karya kita", "venture studio", "studio", "tazkia",
+
+    // Lini 1: Design
+    "desain", "design", "logo", "figma", "ui", "ux", "branding", "brand",
+    "visual identity", "mockup", "guideline", "identitas visual", "bikin logo", "jasa logo",
+
+    // Lini 2: WebTech
+    "web", "website", "landing page", "landingpage", "webtech", "nextjs",
+    "frontend", "backend", "dashboard", "aplikasi web", "custom web",
+    "bikin web", "jasa web", "buat web", "buatkan web", "pembuatan web",
+    "domain", "hosting", "sistem informasi", "coding",
+
+    // Lini 3: Assist & Data
+    "data", "olah data", "statistik", "spss", "analisis data", "skripsi",
+    "tesis", "sop", "pitch deck", "pitchdeck", "feasibility", "kelayakan",
+    "studi kelayakan", "bantu data",
+
+    // Lini 4: Media & Affiliate
+    "video", "reels", "tiktok", "konten", "promosi video", "video produk",
+    "affiliate", "afiliasi", "komisi", "co selling", "co-selling", "marketing video",
+
+    // Lini 5: AI Academy
+    "academy", "ai academy", "workshop", "pelatihan", "kelas ai",
+    "belajar ai", "webinar", "materi ai", "prompt", "sertifikat",
+    "batch 1", "promo 25", "25.000", "25rb", "rp25", "daftar ai",
+    "kursus ai", "training ai",
+
+    // Paket Bundling
+    "bundle", "bundling", "launchpad", "transformasi", "paket hemat", "paket lengkap",
+
+    // Transaksional / Komersial / Keuangan
+    "harga", "price", "pricelist", "daftar harga", "tarif", "biaya",
+    "ongkos", "bayar berapa", "berapaan", "fee", "order", "pesan",
+    "booking", "pembayaran", "bayar", "rekening", "norek", "bsi", "transfer",
+    "invoice", "dp", "down payment", "portofolio", "portfolio", "contoh karya",
+    "akad", "syariah", "ijarah", "riba",
+
+    // Pertanyaan Jasa & Konsultasi
+    "jasa", "layanan", "bisa bantu buat", "bisa buatin", "bisa bikinin",
+    "ada jasa", "apakah melayani", "konsultasi",
+
+    // Human Handover
+    "hubungi admin", "bicara dengan manusia", "bicara admin", "cs manusia",
+    "kontak owner", "kontak admin", "chat admin", "chat manusia",
+    "operator", "customer service"
+  ];
+
+  const words = norm.split(" ");
+  const isMatched = businessKeywords.some((kw) => {
+    // Jika kata kunci pendek (<= 3 huruf seperti "web", "ui", "ux", "dp"), harus cocok sebagai kata utuh
+    if (kw.length <= 3) {
+      return words.includes(kw);
+    }
+    return norm.includes(kw);
+  });
+
+  if (isMatched && fromNumber) {
+    activeKaryaKitaSessions.set(fromNumber, now);
+  }
+
+  return isMatched;
+}
+
+/**
+ * Utilitas untuk mengosongkan riwayat nomor aktif (berguna untuk testing)
+ */
+export function clearActiveSessions(): void {
+  activeKaryaKitaSessions.clear();
+}
+
 /**
  * Normalisasi teks input pengguna untuk pencarian keyword yang tangguh
  */

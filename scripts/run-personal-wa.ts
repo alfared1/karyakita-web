@@ -19,6 +19,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 import { generateGeminiReply } from "../src/lib/ai/gemini-whatsapp";
+import { isKaryaKitaRelevant } from "../src/lib/ai/smart-bot-engine";
 import { BOT_PERSONA } from "../src/config/bot-persona";
 
 // Load environment variables dari .env lalu .env.local (prioritas lebih tinggi)
@@ -226,11 +227,15 @@ async function startWhatsAppBot() {
 const processedMsgMap = new Set<string>();
 
 async function handleIncomingMessage(sock: ReturnType<typeof makeWASocket>, msg: WAMessage) {
-  // 1. Abaikan pesan dari diri sendiri
-  if (!msg.key || msg.key.fromMe) return;
-
-  const remoteJid = msg.key.remoteJid;
+  const remoteJid = msg.key?.remoteJid;
   if (!remoteJid) return;
+  const senderNumber = remoteJid.replace(/@.+$/, "");
+
+  // 1. Deteksi dan cegah looping pesan dari diri sendiri
+  if (msg.key?.fromMe) {
+    console.log(`[WA Pribadi] ℹ️ Pesan dari nomor sendiri (${senderNumber}) diabaikan agar tidak terjadi infinite looping. Gunakan nomor WA lain untuk mengetes bot.`);
+    return;
+  }
 
   // 2. Abaikan pesan broadcast status / story WA & channel newsletter
   if (
@@ -268,24 +273,36 @@ async function handleIncomingMessage(sock: ReturnType<typeof makeWASocket>, msg:
     messageContent.imageMessage?.caption ||
     messageContent.videoMessage?.caption;
 
-  const senderNumber = remoteJid.replace(/@.+$/, "");
   const senderName = msg.pushName || "Kawan";
 
-  // 6. Tangani pesan non-teks (jika hanya kirim stiker/audio/gambar tanpa caption)
+  // 6. Tangani pesan non-teks (stiker/audio/gambar tanpa caption)
   if (!userText || userText.trim() === "") {
-    console.log(`[WA Pribadi] Pesan non-teks dari ${senderNumber} (${senderName})`);
-    await sock.sendMessage(remoteJid, { text: BOT_PERSONA.nonTextMessage }, { quoted: msg });
+    // Hanya respon jika nomor ini sedang dalam sesi konsultasi aktif KaryaKita
+    if (isKaryaKitaRelevant("session_check", senderNumber)) {
+      console.log(`[WA Pribadi] Pesan non-teks dalam sesi aktif dari ${senderNumber} (${senderName})`);
+      await sock.sendMessage(remoteJid, { text: BOT_PERSONA.nonTextMessage }, { quoted: msg });
+    } else {
+      console.log(`[WA Pribadi] ⏭️ Pesan non-teks dari ${senderNumber} diabaikan (bukan dalam sesi KaryaKita).`);
+    }
     return;
   }
 
-  console.log(`[WA Pribadi] Pesan dari ${senderNumber} (${senderName}): "${userText}"`);
+  // 7. FILTER RELEVANSI KARYAKITA:
+  // Hanya balas otomatis jika pesan berkaitan dengan KaryaKita (layanan, harga, web, desain, workshop, dll).
+  // Pesan personal harian (teman, keluarga, obrolan santai) DIABAIKAN agar dijawab manual oleh pemilik akun.
+  if (!isKaryaKitaRelevant(userText, senderNumber)) {
+    console.log(`[WA Pribadi] ⏭️ Pesan dari ${senderNumber} (${senderName}): "${userText}" bukan terkait KaryaKita. Bot diam agar dijawab manual oleh Anda.`);
+    return;
+  }
+
+  console.log(`[WA Pribadi] 🎯 Pesan terkait KaryaKita dari ${senderNumber} (${senderName}): "${userText}"`);
 
   // Tandai pesan sudah dibaca (centang biru)
   try {
     await sock.readMessages([msg.key]);
   } catch {}
 
-  // 7. Hasilkan Balasan dari Gemini AI
+  // 8. Hasilkan Balasan dari Gemini AI / Smart Knowledge Engine
   try {
     const aiReply = await generateGeminiReply(senderNumber, userText, senderName);
 

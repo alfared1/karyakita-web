@@ -4,7 +4,7 @@
  */
 
 import { generateGeminiReply } from "../src/lib/ai/gemini-whatsapp";
-import { getSmartKnowledgeReply } from "../src/lib/ai/smart-bot-engine";
+import { getSmartKnowledgeReply, isKaryaKitaRelevant, clearActiveSessions } from "../src/lib/ai/smart-bot-engine";
 import { BOT_PERSONA } from "../src/config/bot-persona";
 
 async function runTests() {
@@ -113,6 +113,37 @@ async function runTests() {
   assert(
     "Pesan yang tidak dikenali harus memberikan menu panduan ramah, BUKAN pesan error kendala teknis",
     !replyGeneral.includes("kendala teknis") && replyGeneral.includes("KaryaKita WebTech")
+  );
+
+  // 13. Test Filter Relevansi KaryaKita (Pesan Pribadi vs Pesan Bisnis)
+  clearActiveSessions();
+  assert(
+    "Pesan pribadi sehari-hari 'Bro di mana?' HARUS diabaikan (false)",
+    isKaryaKitaRelevant("Bro di mana?") === false
+  );
+  assert(
+    "Pesan santai 'Besok kuliah jam berapa?' HARUS diabaikan (false)",
+    isKaryaKitaRelevant("Besok kuliah jam berapa?") === false
+  );
+  assert(
+    "Pesan pendek 'P' HARUS diabaikan (false)",
+    isKaryaKitaRelevant("P") === false
+  );
+  assert(
+    "Pesan jasa website HARUS dianggap relevan (true)",
+    isKaryaKitaRelevant("halo mau tanya jasa pembuatan landing page", "628999111") === true
+  );
+  assert(
+    "Pesan workshop AI HARUS dianggap relevan (true)",
+    isKaryaKitaRelevant("info pendaftaran workshop ai batch 1") === true
+  );
+  assert(
+    "Pesan pricelist harga HARUS dianggap relevan (true)",
+    isKaryaKitaRelevant("minta pricelist biaya desain logo dong") === true
+  );
+  assert(
+    "Percakapan lanjutan dari nomor yang sedang konsultasi HARUS diizinkan (true)",
+    isKaryaKitaRelevant("oke yang itu berapa hari selesainya?", "628999111") === true
   );
 
   console.log("\n===============================================================");
